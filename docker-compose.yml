@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17.4-alpine
+    container_name: nestjs_prisma_db
+    tty: true
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: nestjs_prisma_db
+    volumes:
+      - ./docker/postgres-data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "46510:5432"
