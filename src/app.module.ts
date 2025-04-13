@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { winstonConfig } from 'src/common/logger/logger.config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PrismaModule } from './modules/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { AuthModule } from './modules/auth/auth.module';
       inject: [ConfigService],
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    PrismaModule,
   ],
   providers: [
     {

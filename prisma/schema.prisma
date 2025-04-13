@@ -23,6 +23,7 @@ model User {
   avatar             String?
   is_active          Boolean      @default(true)
   email_verified     Boolean      @default(false)
+  refreshToken       String?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   deletedAt          DateTime?
