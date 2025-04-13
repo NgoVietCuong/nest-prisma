@@ -5,9 +5,10 @@ import { AppModule } from './app.module';
 import { setupSwagger } from 'src/common/docs/swagger';
 import { AllExceptionFilter } from 'src/common/exception/all-exception.filter';
 import { winstonConfig } from 'src/common/logger/logger.config';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
-  const appName = process.env.USER_WEB_NAME || 'Nestjs Prisma';
+  const appName = process.env.APP_NAME || 'Nestjs Prisma';
   const app = await NestFactory.create(AppModule, {
     logger:  WinstonModule.createLogger(winstonConfig(appName))
   });
@@ -21,9 +22,10 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter));
+  app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   setupSwagger(app, appName);
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.APP_PORT ?? 3000);
 }
 bootstrap();
