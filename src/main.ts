@@ -10,8 +10,10 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 async function bootstrap() {
   const appName = process.env.APP_NAME || 'Nestjs Prisma';
   const app = await NestFactory.create(AppModule, {
-    logger:  WinstonModule.createLogger(winstonConfig(appName))
+    logger: WinstonModule.createLogger(winstonConfig(appName)),
   });
+
+  const reflector = app.get(Reflector);
   const httpAdapter = app.get(HttpAdapterHost);
 
   app.enableCors();
@@ -22,10 +24,13 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter));
-  app.useGlobalInterceptors(new TransformInterceptor());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(
+    new TransformInterceptor(reflector),
+    new ClassSerializerInterceptor(app.get(Reflector))
+  );
 
   setupSwagger(app, appName);
   await app.listen(process.env.APP_PORT ?? 3000);
 }
+
 bootstrap();

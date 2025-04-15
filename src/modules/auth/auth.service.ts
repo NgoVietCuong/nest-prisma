@@ -3,7 +3,6 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserService } from '../user/user.service';
-import { ApiResponse } from '../../common/dto/api-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +23,6 @@ export class AuthService {
     };
 
     await this.userService.createUser(userData);
-    return new ApiResponse<Object>({}, 'Account created successfully');
   }
 
   async login(body: LoginDto) {

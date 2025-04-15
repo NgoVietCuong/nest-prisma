@@ -3,6 +3,7 @@ import { AuthService } from 'src/modules/auth/auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -18,6 +19,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Account already exists'
   })
+  @ResponseMessage('Account created successfully')
   @HttpCode(HttpStatus.OK)
   @Post('sign-up')
   async signUp(@Body() body: SignUpDto) {

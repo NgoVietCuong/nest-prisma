@@ -30,8 +30,6 @@ export const setupSwagger = (app: INestApplication, appName: string) => {
       persistAuthorization: true,
       displayRequestDuration: true,
       docExpansion: 'list',
-      filter: true,
-      tryItOutEnabled: true,
     }
   });
 }
