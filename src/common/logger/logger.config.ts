@@ -3,9 +3,11 @@ import * as winston from 'winston';
 import chalk from 'chalk';
 import 'winston-daily-rotate-file';
 import { SPLAT } from 'triple-beam';
-import 'dotenv/config';
+import { appConfig } from 'config';
 
 export const winstonConfig = (appName: string): WinstonModuleOptions => {
+  const { nodeEnv } = appConfig();
+
   const consoleFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.colorize({ level: true, message: true }),
@@ -46,7 +48,7 @@ export const winstonConfig = (appName: string): WinstonModuleOptions => {
     transports: [
       // Console transport
       new winston.transports.Console({
-        level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+        level: nodeEnv === 'production' ? 'info' : 'debug',
         format: consoleFormat,
         handleExceptions: true,
       }),

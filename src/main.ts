@@ -6,11 +6,14 @@ import { setupSwagger } from 'src/common/docs/swagger';
 import { AllExceptionFilter } from 'src/common/exception/all-exception.filter';
 import { winstonConfig } from 'src/common/logger/logger.config';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { appConfig } from 'config';
 
 async function bootstrap() {
-  const appName = process.env.APP_NAME || 'Nestjs Prisma';
+  const { appName, appPort } = appConfig();
+  const logger = WinstonModule.createLogger(winstonConfig(appName));
+
   const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig(appName)),
+    logger,
   });
 
   const reflector = app.get(Reflector);
@@ -24,13 +27,15 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter));
-  app.useGlobalInterceptors(
-    new TransformInterceptor(reflector),
-    new ClassSerializerInterceptor(app.get(Reflector))
-  );
+  app.useGlobalInterceptors(new TransformInterceptor(reflector), new ClassSerializerInterceptor(app.get(Reflector)));
 
-  setupSwagger(app, appName);
-  await app.listen(process.env.APP_PORT ?? 3000);
+  setupSwagger(app);
+  await app.listen(appPort);
+
+  logger.log({
+    message: `Application is ready. View Swagger at http://localhost:${appPort}/api/docs`,
+    context: 'Application',
+  });
 }
 
 bootstrap();
