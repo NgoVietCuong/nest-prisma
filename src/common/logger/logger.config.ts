@@ -3,10 +3,10 @@ import * as winston from 'winston';
 import chalk from 'chalk';
 import 'winston-daily-rotate-file';
 import { SPLAT } from 'triple-beam';
-import { appConfig } from 'config';
+import { getAppConfig } from 'config';
 
 export const winstonConfig = (appName: string): WinstonModuleOptions => {
-  const { nodeEnv } = appConfig();
+  const { nodeEnv } = getAppConfig();
 
   const consoleFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),

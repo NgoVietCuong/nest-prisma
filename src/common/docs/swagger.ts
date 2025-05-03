@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { appConfig } from 'config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { getAppConfig } from 'config';
 
 export const setupSwagger = (app: INestApplication) => {
-  const { appName, nodeEnv } = appConfig();
-  if (nodeEnv === 'production') return;
+  const { appName, isProductionEnv } = getAppConfig();
+  if (isProductionEnv) return;
 
   const config = new DocumentBuilder()
     .setTitle(`${appName} Documentation Swagger`)

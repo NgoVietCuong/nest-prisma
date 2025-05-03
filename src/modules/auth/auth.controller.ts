@@ -1,9 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
-import { SignUpDto } from './dto/sign-up.dto';
-import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
+import { ResponseMessage } from 'src/common/decorators';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -22,7 +21,7 @@ export class AuthController {
   @ResponseMessage('Account created successfully')
   @HttpCode(HttpStatus.OK)
   @Post('sign-up')
-  async signUp(@Body() body: SignUpDto) {
+  async signUp(@Body() body: SignUpBodyDto) {
     return this.authService.signUp(body);
   }
 
@@ -30,7 +29,7 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: LoginDto) {
+  async login(@Body() body: LoginBodyDto) {
     return this.authService.login(body);
   }
 }

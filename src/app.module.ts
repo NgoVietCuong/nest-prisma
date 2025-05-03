@@ -1,12 +1,11 @@
-import { Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/common/logger/logger.config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { PrismaModule } from './modules/prisma/prisma.module';
-import { validationSchema } from 'config';
+import { PrismaModule } from 'src/shared/prisma';
+import { validationSchema, appConfiguration } from 'config';
 
 @Module({
   imports: [
@@ -17,23 +16,18 @@ import { validationSchema } from 'config';
       validationOptions: {
         abortEarly: true,
       },
+      load: [appConfiguration],
     }),
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        return winstonConfig(configService.get<string>('APP_NAME')!);
+      useFactory: (appConfig: ConfigType<typeof appConfiguration>) => {
+        return winstonConfig(appConfig.appName);
       },
-      inject: [ConfigService],
+      inject: [appConfiguration.KEY],
     }),
     UserModule,
     AuthModule,
     PrismaModule,
-  ],
-  providers: [
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-  ],
+  ]
 })
 export class AppModule {}

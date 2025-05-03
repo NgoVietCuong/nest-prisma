@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, NotContains } from 'class-validator';
 
-export class SignUpDto {
+export class SignUpBodyDto {
   @IsString()
   @IsNotEmpty()
   username: string;
@@ -12,6 +12,8 @@ export class SignUpDto {
   @Transform((param) => param.value.toLowerCase())
   email: string;
 
+  @IsString()
+  @IsNotEmpty()
   @IsStrongPassword()
   password: string;
 }

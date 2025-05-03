@@ -13,18 +13,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // -------------------------------- Models ------------------------------
 model User {
-  id                 Int          @id @default(autoincrement())
-  username           String
-  email              String       @unique
-  password           String
-  avatar             String?
-  is_active          Boolean      @default(true)
-  email_verified     Boolean      @default(false)
-  refresh_token       String?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  deletedAt          DateTime?
+  id             Int       @id @default(autoincrement())
+  username       String
+  email          String    @unique
+  password       String
+  avatar         String?
+  role           Role
+  is_active      Boolean   @default(true)
+  email_verified Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
 }
