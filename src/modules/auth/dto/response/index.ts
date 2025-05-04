@@ -1,1 +1,1 @@
-export * from 'src/modules/auth/dto/response/sign-up.response.dto'
+export * from './sign-up.response.dto'

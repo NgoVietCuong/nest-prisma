@@ -1,3 +1,6 @@
+import { Expose } from 'class-transformer';
+
 export class SignUpResponseDto {
-  message: string;
+  @Expose()
+  id: number;
 }

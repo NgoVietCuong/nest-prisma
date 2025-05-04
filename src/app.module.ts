@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from 'src/common/logger/logger.config';
-import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './modules/auth/auth.module';
+import { winstonConfig } from 'src/common/logger';
+import { UserModule } from 'src/modules/user';
+import { AuthModule } from 'src/modules/auth';
 import { PrismaModule } from 'src/shared/prisma';
 import { validationSchema, appConfiguration } from 'config';
 

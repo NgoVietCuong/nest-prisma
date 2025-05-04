@@ -3,12 +3,12 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-import { setupSwagger } from 'src/common/docs/swagger';
 import { AllExceptionFilter } from 'src/common/exceptions';
-import { winstonConfig } from 'src/common/logger/logger.config';
-import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
+import { TransformInterceptor } from 'src/common/interceptors';
+import { PayloadValidationPipe } from 'src/common/pipes';
+import { setupSwagger } from 'src/common/docs';
+import { winstonConfig } from 'src/common/logger';
 import { getAppConfig } from 'config';
-import { PayloadValidationPipe } from 'src/common/pipes/payload-validation.pipe';
 
 async function bootstrap() {
   const { appName, appPort } = getAppConfig();

@@ -26,7 +26,9 @@ export class AuthService {
       role: Role.USER
     };
 
-    await this.userService.createUser(userData);
+    const newUser= await this.userService.createUser(userData);
+
+    return { id: newUser.id };
   }
 
   async login(body: LoginBodyDto) {
