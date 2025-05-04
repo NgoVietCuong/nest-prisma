@@ -35,8 +35,10 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (isHttpException) {
       const exceptionResponse = exception.getResponse() as HttpExceptionResponseDto;
       Object.assign(responseBody, exceptionResponse);
+
+      console.log(responseBody, httpStatus, exceptionResponse)
     } else {
-      Object.assign(responseBody, {...ERROR_RESPONSE.INTERNAL_SERVER_ERROR, details: exception});
+      Object.assign(responseBody, {...ERROR_RESPONSE.INTERNAL_SERVER_ERROR, details: exception });
     }
 
     // Remove error details in production

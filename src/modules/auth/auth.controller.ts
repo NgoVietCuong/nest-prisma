@@ -16,7 +16,7 @@ export class AuthController {
     type: SignUpResponseDto,
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
+    status: HttpStatus.CONFLICT,
     description: 'Account already exists'
   })
   @ResponseMessage('Account created successfully')
