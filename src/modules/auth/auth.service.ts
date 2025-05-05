@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
-import { UserService } from '../user/user.service';
+import { UserService } from 'src/modules/user';
 import { ServerException } from 'src/common/exceptions';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { Role } from '@prisma/client';

@@ -1,1 +1,2 @@
-export * from 'src/shared/constants/error-response.constant';
+export * from './app.constant';
+export * from './error-response.constant';
