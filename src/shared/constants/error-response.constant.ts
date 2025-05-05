@@ -10,7 +10,7 @@ export const ERROR_RESPONSE = {
   UNAUTHORIZED: {
     statusCode: HttpStatus.UNAUTHORIZED,
     errorCode: 'UNAUTHORIZED',
-    message: 'Unauthorized',
+    message: 'Authentication required',
   },
   BAD_REQUEST: {
     statusCode: HttpStatus.BAD_REQUEST,
@@ -20,12 +20,12 @@ export const ERROR_RESPONSE = {
   INVALID_CREDENTIALS: {
     statusCode: HttpStatus.UNAUTHORIZED,
     errorCode: 'INVALID_CREDENTIALS',
-    message: `Invalid credentials`,
+    message: `Authentication failed`,
   },
   RESOURCE_FORBIDDEN: {
     statusCode: HttpStatus.FORBIDDEN,
     errorCode: 'RESOURCE_FORBIDDEN',
-    message: 'Resource forbidden',
+    message: 'Access denied',
   },
   RESOURCE_NOT_FOUND: {
     statusCode: HttpStatus.NOT_FOUND,
@@ -43,4 +43,14 @@ export const ERROR_RESPONSE = {
     errorCode: 'USER_ALREADY_EXISTS',
     message: 'Unable to create account with provided credentials',
   },
+  EMAIL_NOT_VERIFIED: {
+    statusCode: HttpStatus.UNAUTHORIZED,
+    errorCode: 'EMAIL_NOT_VERIFIED',
+    message: 'Email not verified',
+  },
+  USER_DEACTIVATED: {
+    statusCode: HttpStatus.FORBIDDEN,
+    errorCode: 'USER_DEACTIVATED',
+    message: 'Account access denied',
+  }
 }

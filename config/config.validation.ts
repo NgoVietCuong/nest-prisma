@@ -10,4 +10,7 @@ export const validationSchema = Joi.object({
 
   //Database config validation
   DATABASE_URL: Joi.string().required(),
+
+  //Redis config validation
+  REDIS_URL: Joi.string().required()
 });

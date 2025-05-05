@@ -12,3 +12,9 @@ services:
     restart: always
     ports:
       - "46510:5432"
+  redis:
+    image: redis:8.0-rc1-alpine
+    container_name: nestjs_prisma_redis
+    restart: always
+    ports:
+      - "46511:6379"
