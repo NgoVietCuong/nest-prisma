@@ -1,1 +1,2 @@
-export * from 'src/shared/enums/environment.enum';
+export * from './environment.enum';
+export * from './jwt-algorithm.enum';

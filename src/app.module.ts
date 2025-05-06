@@ -8,7 +8,7 @@ import { winstonConfig } from 'src/common/logger';
 import { UserModule } from 'src/modules/user';
 import { AuthModule } from 'src/modules/auth';
 import { PrismaModule } from 'src/shared/prisma';
-import { validationSchema, appConfiguration } from 'config';
+import { validationSchema, appConfiguration, jwtConfiguration } from 'config';
 
 @Module({
   imports: [
@@ -19,11 +19,10 @@ import { validationSchema, appConfiguration } from 'config';
       validationOptions: {
         abortEarly: true,
       },
-      load: [appConfiguration],
+      load: [appConfiguration, jwtConfiguration],
     }),
     CacheModule.registerAsync({
       isGlobal: true,
-      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
           stores: [
@@ -34,7 +33,6 @@ import { validationSchema, appConfiguration } from 'config';
       inject: [ConfigService]
     }),
     WinstonModule.forRootAsync({
-      imports: [ConfigModule],
       useFactory: (appConfig: ConfigType<typeof appConfiguration>) => {
         return winstonConfig(appConfig.appName);
       },

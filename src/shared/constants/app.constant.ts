@@ -8,10 +8,10 @@ export const APP_CONSTANT = {
     TTL: 300, // 5 minutes
   },
   ACCESS_TOKEN: {
-    EXPIRES_IN: '1d',
+    EXPIRES_IN: 2592000,
   },
   REFRESH_TOKEN: {
-    EXPIRES_IN: '30d',
-    TLL: 2592000, // 30 days
+    EXPIRES_IN: 2592000 // 30 days
   },
-}
+};
+

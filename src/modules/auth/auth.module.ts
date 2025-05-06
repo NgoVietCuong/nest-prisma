@@ -8,10 +8,10 @@ import { jwtConfiguration } from 'config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ load: [jwtConfiguration] }),
+    ConfigModule.forFeature(jwtConfiguration),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
       useFactory: async (jwtConfig: ConfigType<typeof jwtConfiguration>) => ({
+        global: true,
         secret: jwtConfig.secret,
         signOptions: {
           algorithm: jwtConfig.algorithm,
