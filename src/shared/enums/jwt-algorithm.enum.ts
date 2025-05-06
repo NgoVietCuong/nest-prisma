@@ -1,4 +1,4 @@
-export enum JWT_ALGORITHM {
+export enum JwtAlgorithm {
   HS256 = 'HS256',
   HS384 = 'HS384',
   HS512 = 'HS512',
@@ -11,5 +11,5 @@ export enum JWT_ALGORITHM {
   PS256 = 'PS256',
   PS384 = 'PS384',
   PS512 = 'PS512',
-  NONE = 'none',
+  None = 'none',
 }

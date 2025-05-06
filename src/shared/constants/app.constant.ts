@@ -1,4 +1,11 @@
-export const APP_CONSTANT = {
+import { NodeEnv } from '../enums';
+
+export const APP_DEFAULTS = {
+  NODE_ENV: NodeEnv.LOCAL,
+  APP_NAME: 'Nestjs Prisma',
+  APP_PORT: '3000',
+  ACCESS_TOKEN_EXPIRES_IN: 86400, // 1 day,
+  REFRESH_TOKEN_EXPIRES_IN: 2592000, // 30 days
   RESET_PASSWORD_CODE: {
     LENGTH: 6,
     TTL: 600, // 10 minutes
@@ -6,12 +13,6 @@ export const APP_CONSTANT = {
   VERIFY_SIGNUP_CODE: {
     LENGTH: 6,
     TTL: 300, // 5 minutes
-  },
-  ACCESS_TOKEN: {
-    EXPIRES_IN: 2592000,
-  },
-  REFRESH_TOKEN: {
-    EXPIRES_IN: 2592000 // 30 days
   },
 };
 

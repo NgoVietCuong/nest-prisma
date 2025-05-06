@@ -1,8 +1,8 @@
 import * as Joi from 'joi';
-import { NODE_ENV, JWT_ALGORITHM } from 'src/shared/enums';
+import { NodeEnv, JwtAlgorithm } from 'src/shared/enums';
 
 export const validationSchema = Joi.object({
-  NODE_ENV: Joi.string().valid(...Object.values(NODE_ENV)).required(),
+  NODE_ENV: Joi.string().valid(...Object.values(NodeEnv)).required(),
 
   //App config validation
   APP_NAME: Joi.string().required(),
@@ -16,14 +16,14 @@ export const validationSchema = Joi.object({
 
   //JWT config validation
   JWT_SECRET: Joi.string().required(),
-  JWT_ALGORITHM: Joi.string().valid(...Object.values(JWT_ALGORITHM)).required(),
+  JWT_ALGORITHM: Joi.string().valid(...Object.values(JwtAlgorithm)).required(),
   JWT_ACCESS_TOKEN_EXPIRES_IN: Joi.number().when('NODE_ENV', {
-    is: Joi.string().valid(NODE_ENV.PRODUCTION),
+    is: Joi.string().valid(NodeEnv.PRODUCTION),
     then: Joi.number().required(),
     otherwise: Joi.number().optional(),
   }),
   JWT_REFRESH_TOKEN_EXPIRES_IN: Joi.number().when('NODE_ENV', {
-    is: Joi.string().valid(NODE_ENV.PRODUCTION),
+    is: Joi.string().valid(NodeEnv.PRODUCTION),
     then: Joi.number().required(),
     otherwise: Joi.number().optional(),
   }),

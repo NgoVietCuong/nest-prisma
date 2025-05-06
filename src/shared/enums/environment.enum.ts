@@ -1,4 +1,4 @@
-export enum NODE_ENV {
+export enum NodeEnv {
   LOCAL = 'local',
   DEVELOPMENT = 'development',
   TEST = 'test',
