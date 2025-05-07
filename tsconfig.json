@@ -18,7 +18,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "config": ["config/index"]
+      "config": ["config/index"],
+      "src/*": ["src/*"]
     }
   }
 }

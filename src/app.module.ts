@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/common/logger';
 import { UserModule } from 'src/modules/user';
 import { AuthModule } from 'src/modules/auth';
 import { PrismaModule } from 'src/shared/prisma';
+import { CacheProviderModule } from 'src/shared/cache';
 import { validationSchema, appConfiguration, jwtConfiguration } from 'config';
 
 @Module({
@@ -19,18 +19,7 @@ import { validationSchema, appConfiguration, jwtConfiguration } from 'config';
       validationOptions: {
         abortEarly: true,
       },
-      load: [appConfiguration, jwtConfiguration],
-    }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async (configService: ConfigService) => {
-        return {
-          stores: [
-            createKeyv(configService.get<string>('REDIS_URL')),
-          ],
-        };
-      },
-      inject: [ConfigService]
+      load: [appConfiguration],
     }),
     WinstonModule.forRootAsync({
       useFactory: (appConfig: ConfigType<typeof appConfiguration>) => {
@@ -38,6 +27,7 @@ import { validationSchema, appConfiguration, jwtConfiguration } from 'config';
       },
       inject: [appConfiguration.KEY],
     }),
+    CacheProviderModule,
     UserModule,
     AuthModule,
     PrismaModule,
