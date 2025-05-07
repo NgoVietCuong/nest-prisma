@@ -11,7 +11,7 @@ import { winstonConfig } from 'src/common/logger';
 import { getAppConfig } from 'config';
 
 async function bootstrap() {
-  const { appName, appPort } = getAppConfig();
+  const { appName, appPort, isProductionEnv } = getAppConfig();
   const logger = WinstonModule.createLogger(winstonConfig(appName));
 
   const app = await NestFactory.create(AppModule, {
@@ -23,19 +23,18 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors();
-  app.useGlobalPipes(
-    new PayloadValidationPipe()
-  );
+  app.useGlobalPipes(new PayloadValidationPipe());
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter, configService));
   app.useGlobalInterceptors(new TransformInterceptor(reflector), new ClassSerializerInterceptor(app.get(Reflector)));
 
   setupSwagger(app);
   await app.listen(appPort);
 
-  logger.log({
-    message: `Application is ready. View Swagger at http://localhost:${appPort}/api/docs`,
-    context: 'Application',
-  });
+  !isProductionEnv &&
+    logger.log({
+      message: `Application is ready. View Swagger at http://localhost:${appPort}/api/docs`,
+      context: 'Application',
+    });
 }
 
 bootstrap();
