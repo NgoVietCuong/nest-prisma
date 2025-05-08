@@ -1,55 +1,42 @@
 import { Global, Module } from '@nestjs/common';
-import KeyvRedis, { createKeyv } from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
+import IORedis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from './cache.service';
-import { Cacheable } from 'cacheable';
-// import { redisStore } from 'cache-manager-redis-yet';
-import Keyv from 'keyv';
-import IORedis from 'ioredis';
-import * as redisStore from 'cache-manager-ioredis';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Global()
 @Module({
   imports: [
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: async (configService: ConfigService) => {
-        const host = configService.get<string>('REDIS_HOST') || 'localhost';
-        const port = configService.get<number>('REDIS_PORT') || 6379;
+      useFactory: async (configService: ConfigService, logger: Logger) => {
+        const redisUrl = configService.get<string>('REDIS_URL')!;
 
-        // 🔐 Explicit connection test
-        const testRedis = new IORedis({ host, port });
+        // Explicit connection test
+        const redisClient = new IORedis(redisUrl, { retryStrategy: () => null, maxRetriesPerRequest: 1 });
+        redisClient.on('error', (err) => {
+          logger.error({ message: `${err.message}`, context: 'RedisClient' });
+        });
+
         try {
-          await testRedis.ping();
+          await redisClient.ping();
         } catch (err) {
-          throw new Error(`Redis Connection Error: ${err.message}`);
+          throw new Error(err.message);
         } finally {
-          await testRedis.quit();
+          await redisClient.quit();
         }
 
-        // ✅ Safe to proceed with cache-manager-ioredis
         return {
-          store: redisStore,
-          host,
-          port,
+          stores: [createKeyv(redisUrl)],
         };
       },
-      inject: [ConfigService]
+      inject: [ConfigService, WINSTON_MODULE_NEST_PROVIDER],
     }),
-    // CacheModule.registerAsync({
-    //   isGlobal: true,
-    //   useFactory: async () => ({
-    //     store: await redisStore({
-    //       socket: {
-    //         host: 'localhost',
-    //         port: 6379,
-    //       },
-    //     }),
-    //   }),
-    // }),
   ],
   providers: [CacheService],
-  exports: [CacheService]
+  exports: [CacheService],
 })
 export class CacheProviderModule {}

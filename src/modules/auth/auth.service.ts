@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigType } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { Role, User } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
 import { CacheService } from 'src/shared/cache';
@@ -57,7 +57,11 @@ export class AuthService {
       id: user.id,
       email: user.email,
     });
-    await this.cacheService.setCache<string>(`${JwtTokenType.REFRESH_TOKEN}-${user.id}`, refreshToken);
+    await this.cacheService.setCache<string>(
+      `${JwtTokenType.REFRESH_TOKEN}-${user.id}`,
+      refreshToken,
+      this.jwtConfig.refreshTokenExpiresIn,
+    );
 
     return { accessToken, refreshToken };
   }
@@ -65,17 +69,17 @@ export class AuthService {
   private async generateTokens(payload: Partial<JwtPayload>) {
     const accessTokenPayload = {
       ...payload,
-      type: JwtTokenType.ACCESS_TOKEN
+      type: JwtTokenType.ACCESS_TOKEN,
     } as JwtPayload;
 
     const refreshTokenPayload: JwtPayload = {
       ...payload,
-      type: JwtTokenType.REFRESH_TOKEN
+      type: JwtTokenType.REFRESH_TOKEN,
     } as JwtPayload;
 
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(accessTokenPayload, { expiresIn: this.jwtConfig.accessTokenExpiresIn}),
-      this.jwtService.signAsync(refreshTokenPayload, { expiresIn: this.jwtConfig.refreshTokenExpiresIn}),
+      this.jwtService.signAsync(accessTokenPayload, { expiresIn: this.jwtConfig.accessTokenExpiresIn }),
+      this.jwtService.signAsync(refreshTokenPayload, { expiresIn: this.jwtConfig.refreshTokenExpiresIn }),
     ]);
 
     return {

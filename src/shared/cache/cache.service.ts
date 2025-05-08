@@ -4,12 +4,10 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CacheService {
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async setCache<T>(key: string, value: T, ttl?: string): Promise<void> {
-    await this.cacheManager.set(key, value);
+  async setCache<T>(key: string, value: T, ttl?: number): Promise<void> {
+    await this.cacheManager.set(key, value, ttl);
   }
 
   async deleteCache(key: string): Promise<void> {

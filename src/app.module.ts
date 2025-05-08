@@ -33,10 +33,10 @@ import { validationSchema, appConfiguration, jwtConfiguration } from 'config';
     PrismaModule,
   ],
   providers: [
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: CacheInterceptor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
   ]
 })
 export class AppModule {}
