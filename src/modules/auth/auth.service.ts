@@ -1,14 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigType } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { Role, User } from '@prisma/client';
 import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
+import { CacheService } from 'src/shared/cache';
 import { ServerException } from 'src/common/exceptions';
 import { ERROR_RESPONSE } from 'src/shared/constants';
-import { Role } from '@prisma/client';
+import { jwtConfiguration } from 'config';
+import { JwtTokenType } from './auth.enum';
+import { JwtPayload } from './auth.interface';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly cacheService: CacheService,
+    @Inject(jwtConfiguration.KEY) private readonly jwtConfig: ConfigType<typeof jwtConfiguration>,
+  ) {}
 
   async signUp(body: SignUpBodyDto) {
     const { username, email, password } = body;
@@ -42,7 +53,34 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
 
+    const { accessToken, refreshToken } = await this.generateTokens({
+      id: user.id,
+      email: user.email,
+    });
+    await this.cacheService.setCache<string>(`${JwtTokenType.REFRESH_TOKEN}-${user.id}`, refreshToken);
 
-    return {};
+    return { accessToken, refreshToken };
+  }
+
+  private async generateTokens(payload: Partial<JwtPayload>) {
+    const accessTokenPayload = {
+      ...payload,
+      type: JwtTokenType.ACCESS_TOKEN
+    } as JwtPayload;
+
+    const refreshTokenPayload: JwtPayload = {
+      ...payload,
+      type: JwtTokenType.REFRESH_TOKEN
+    } as JwtPayload;
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(accessTokenPayload, { expiresIn: this.jwtConfig.accessTokenExpiresIn}),
+      this.jwtService.signAsync(refreshTokenPayload, { expiresIn: this.jwtConfig.refreshTokenExpiresIn}),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

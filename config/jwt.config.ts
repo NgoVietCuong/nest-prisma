@@ -6,6 +6,6 @@ import { APP_DEFAULTS } from 'src/shared/constants';
 export default registerAs('jwt', () => ({
   secret: process.env.JWT_SECRET,
   algorithm: (process.env.JWT_ALGORITHM as Algorithm) || JwtAlgorithm.HS256,
-  accessTokenExpired: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || APP_DEFAULTS.ACCESS_TOKEN_EXPIRES_IN,
-  refreshTokenExpired: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || APP_DEFAULTS.REFRESH_TOKEN_EXPIRES_IN,
+  accessTokenExpiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || APP_DEFAULTS.ACCESS_TOKEN_EXPIRES_IN,
+  refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN || APP_DEFAULTS.REFRESH_TOKEN_EXPIRES_IN,
 }));

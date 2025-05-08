@@ -4,33 +4,51 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+  binaryTargets   = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+generator prisma-class-generator {
+  provider                 = "prisma-class-generator"
+  dryRun                   = "false"
+  output                   = "dtos"
+  useSwagger               = "true"
+  makeIndexFile            = "true"
+  separateRelationFields   = "true"
+  clientImportPath         = "@prisma/client"
+  useNonNullableAssertions = "false"
+  preserveDefaultNullable  = "false"
+}
+
 // -------------------------------- Models ------------------------------
 model User {
-  id             Int       @id @default(autoincrement())
-  username       String
-  email          String    @unique
-  password       String
-  avatar         String?
-  role           Role
-  isActive       Boolean   @map("is_active") @default(true)
-  emailVerified  Boolean   @map("email_verified") @default(false)
-  createdAt      DateTime  @map("created_at") @default(now())
-  updatedAt      DateTime  @map("updated_at") @updatedAt
-  deletedAt      DateTime? @map("deleted_at")
+  id            Int       @id @default(autoincrement())
+  username      String
+  email         String    @unique
+  password      String
+  avatar        String?
+  role          Role      @default(USER)
+  isActive      Boolean   @default(true) @map("is_active")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
   @@map("users")
 }
 
 enum Role {
-  ADMIN
-  USER
+  ADMIN @map("admin")
+  USER  @map("user")
 }

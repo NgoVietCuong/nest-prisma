@@ -8,6 +8,7 @@ import { jwtConfiguration } from 'config';
 
 @Module({
   imports: [
+    ConfigModule.forFeature(jwtConfiguration),
     JwtModule.registerAsync({
       imports: [ConfigModule.forFeature(jwtConfiguration)],
       useFactory: async (jwtConfig: ConfigType<typeof jwtConfiguration>) => ({
