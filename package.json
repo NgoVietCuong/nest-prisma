@@ -17,7 +17,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "cli": "ts-node -r tsconfig-paths/register src/cli.ts",
+    "gen-admin": "ts-node -r tsconfig-paths/register src/cli.ts generate-admin"
   },
   "dependencies": {
     "@": "nestjs/jwt",
@@ -39,6 +41,7 @@
     "ioredis": "^5.6.1",
     "joi": "^17.13.3",
     "keyv": "^5.3.3",
+    "nest-commander": "^3.17.0",
     "nest-winston": "^1.10.2",
     "prisma": "^6.6.0",
     "prisma-class-generator": "^0.2.11",

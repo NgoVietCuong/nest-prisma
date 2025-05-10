@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "config": ["config/index"],
-//      "src/*": ["src/*"]
+      "src/*": ["src/*"]
     }
   }
 }
