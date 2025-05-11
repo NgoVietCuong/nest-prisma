@@ -52,5 +52,10 @@ export const ERROR_RESPONSE = {
     statusCode: HttpStatus.FORBIDDEN,
     errorCode: 'USER_DEACTIVATED',
     message: 'Account access denied',
-  }
-}
+  },
+  INVALID_TOKEN_USAGE: {
+    statusCode: HttpStatus.FORBIDDEN,
+    errorCode: 'INVALID_TOKEN_USAGE',
+    message: 'Invalid token type',
+  },
+};

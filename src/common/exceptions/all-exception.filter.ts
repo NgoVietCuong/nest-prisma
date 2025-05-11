@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionResponseDto } from 'src/common/dto';
@@ -14,7 +8,7 @@ import { ERROR_RESPONSE } from 'src/shared/constants';
 export class AllExceptionFilter implements ExceptionFilter {
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
@@ -30,13 +24,15 @@ export class AllExceptionFilter implements ExceptionFilter {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
       path: ctx.getRequest().url,
-    }
+    };
+
+    console.log('error', exception);
 
     if (isHttpException) {
       const exceptionResponse = exception.getResponse() as HttpExceptionResponseDto;
       Object.assign(responseBody, exceptionResponse);
     } else {
-      Object.assign(responseBody, {...ERROR_RESPONSE.INTERNAL_SERVER_ERROR, details: exception });
+      Object.assign(responseBody, { ...ERROR_RESPONSE.INTERNAL_SERVER_ERROR, details: exception });
     }
 
     // Remove error details in production

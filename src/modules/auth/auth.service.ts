@@ -9,8 +9,8 @@ import { CacheService } from 'src/shared/cache';
 import { ServerException } from 'src/common/exceptions';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { jwtConfiguration } from 'config';
-import { JwtTokenType } from './auth.enum';
-import { JwtPayload } from './auth.interface';
+import { JwtTokenType } from 'src/shared/enums';
+import { JwtPayload, RequestUserPayload } from './auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -53,38 +53,48 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
 
-    const { accessToken, refreshToken } = await this.generateTokens({
+    const tokenPayload = {
       id: user.id,
       email: user.email,
-    });
+      role: user.role,
+    };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateToken(tokenPayload, JwtTokenType.ACCESS_TOKEN, this.jwtConfig.accessTokenExpiresIn),
+      this.generateToken(tokenPayload, JwtTokenType.REFRESH_TOKEN, this.jwtConfig.refreshTokenExpiresIn),
+    ]);
+
     await this.cacheService.setCache<string>(
-      `${JwtTokenType.REFRESH_TOKEN}-${user.id}`,
+      `${JwtTokenType.REFRESH_TOKEN}_${user.id}`,
       refreshToken,
-      this.jwtConfig.refreshTokenExpiresIn,
+      this.jwtConfig.refreshTokenExpiresIn * 1000,
     );
 
     return { accessToken, refreshToken };
   }
 
-  private async generateTokens(payload: Partial<JwtPayload>) {
-    const accessTokenPayload = {
-      ...payload,
-      type: JwtTokenType.ACCESS_TOKEN,
-    } as JwtPayload;
+  async logout(userId: number) {
+    await this.cacheService.deleteCache(`${JwtTokenType.REFRESH_TOKEN}_${userId}`);
+    return {};
+  }
 
-    const refreshTokenPayload: JwtPayload = {
-      ...payload,
-      type: JwtTokenType.REFRESH_TOKEN,
-    } as JwtPayload;
+  async refreshToken(userPayload: RequestUserPayload) {
+    const accessToken = await this.generateToken(
+      userPayload,
+      JwtTokenType.ACCESS_TOKEN,
+      this.jwtConfig.accessTokenExpiresIn,
+    );
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(accessTokenPayload, { expiresIn: this.jwtConfig.accessTokenExpiresIn }),
-      this.jwtService.signAsync(refreshTokenPayload, { expiresIn: this.jwtConfig.refreshTokenExpiresIn }),
-    ]);
+    return { accessToken };
+  }
 
-    return {
-      accessToken,
-      refreshToken,
+  private async generateToken(payload: Partial<JwtPayload>, type: JwtTokenType, expiresIn: number) {
+    const tokenPayload: JwtPayload = {
+      id: payload.id!,
+      email: payload.email!,
+      type,
+      ...(type === JwtTokenType.ACCESS_TOKEN && { role: payload.role }),
     };
+
+    return this.jwtService.signAsync(tokenPayload, { expiresIn });
   }
 }

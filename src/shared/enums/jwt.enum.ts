@@ -13,3 +13,8 @@ export enum JwtAlgorithm {
   PS512 = 'PS512',
   None = 'none',
 }
+
+export enum JwtTokenType {
+  ACCESS_TOKEN = 'access_token',
+  REFRESH_TOKEN = 'refresh_token',
+}
