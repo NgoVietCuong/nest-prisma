@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigType } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
+import { ServerException } from 'src/common/exceptions';
+import { jwtConfiguration } from 'src/config';
+import { RedisService } from 'src/infrastructure/redis';
 import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
-import { CacheService } from 'src/shared/cache';
-import { ServerException } from 'src/common/exceptions';
 import { ERROR_RESPONSE } from 'src/shared/constants';
-import { jwtConfiguration } from 'config';
 import { JwtTokenType } from 'src/shared/enums';
 import { JwtPayload, RequestUserPayload } from './auth.interface';
 
@@ -17,7 +17,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly cacheService: CacheService,
+    private readonly redisService: RedisService,
     @Inject(jwtConfiguration.KEY) private readonly jwtConfig: ConfigType<typeof jwtConfiguration>,
   ) {}
 
@@ -59,12 +59,12 @@ export class AuthService {
       role: user.role,
     };
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateToken(tokenPayload, JwtTokenType.ACCESS_TOKEN, this.jwtConfig.accessTokenExpiresIn),
-      this.generateToken(tokenPayload, JwtTokenType.REFRESH_TOKEN, this.jwtConfig.refreshTokenExpiresIn),
+      this.generateToken(tokenPayload, JwtTokenType.AccessToken, this.jwtConfig.accessTokenExpiresIn),
+      this.generateToken(tokenPayload, JwtTokenType.RefreshToken, this.jwtConfig.refreshTokenExpiresIn),
     ]);
 
-    await this.cacheService.setCache<string>(
-      `${JwtTokenType.REFRESH_TOKEN}_${user.id}`,
+    await this.redisService.setValue<string>(
+      `${JwtTokenType.RefreshToken}_${user.id}`,
       refreshToken,
       this.jwtConfig.refreshTokenExpiresIn * 1000,
     );
@@ -73,26 +73,27 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    await this.cacheService.deleteCache(`${JwtTokenType.REFRESH_TOKEN}_${userId}`);
+    await this.redisService.deleteKey(`${JwtTokenType.RefreshToken}_${userId}`);
     return {};
   }
 
   async refreshToken(userPayload: RequestUserPayload) {
     const accessToken = await this.generateToken(
       userPayload,
-      JwtTokenType.ACCESS_TOKEN,
+      JwtTokenType.AccessToken,
+
       this.jwtConfig.accessTokenExpiresIn,
     );
 
     return { accessToken };
   }
 
-  private async generateToken(payload: Partial<JwtPayload>, type: JwtTokenType, expiresIn: number) {
+  private generateToken(payload: Partial<JwtPayload>, type: JwtTokenType, expiresIn: number): Promise<string> {
     const tokenPayload: JwtPayload = {
       id: payload.id!,
       email: payload.email!,
       type,
-      ...(type === JwtTokenType.ACCESS_TOKEN && { role: payload.role }),
+      ...(type === JwtTokenType.AccessToken && { role: payload.role }),
     };
 
     return this.jwtService.signAsync(tokenPayload, { expiresIn });

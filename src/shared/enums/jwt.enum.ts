@@ -15,6 +15,6 @@ export enum JwtAlgorithm {
 }
 
 export enum JwtTokenType {
-  ACCESS_TOKEN = 'access_token',
-  REFRESH_TOKEN = 'refresh_token',
+  AccessToken = 'access_token',
+  RefreshToken = 'refresh_token',
 }

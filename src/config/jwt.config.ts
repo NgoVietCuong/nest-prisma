@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { Algorithm } from 'jsonwebtoken';
+import type { Algorithm } from 'jsonwebtoken';
 import { JwtAlgorithm } from 'src/shared/enums';
 import { APP_DEFAULTS } from 'src/shared/constants';
 

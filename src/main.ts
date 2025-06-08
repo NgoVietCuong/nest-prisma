@@ -7,8 +7,8 @@ import { AllExceptionFilter } from 'src/common/exceptions';
 import { TransformInterceptor } from 'src/common/interceptors';
 import { PayloadValidationPipe } from 'src/common/pipes';
 import { setupSwagger } from 'src/common/docs';
-import { winstonConfig } from 'src/common/logger';
-import { getAppConfig } from 'config';
+import { winstonConfig } from 'src/infrastructure/logger';
+import { getAppConfig } from 'src/config';
 
 async function bootstrap() {
   const { appName, appPort, isProductionEnv } = getAppConfig();

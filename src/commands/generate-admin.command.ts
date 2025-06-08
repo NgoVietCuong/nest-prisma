@@ -1,6 +1,6 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
 import { isEmail } from 'class-validator';
-import { PrismaService } from 'src/shared/prisma';
+import { PrismaService } from 'src/infrastructure/prisma';
 import { ServerException } from 'src/common/exceptions';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { Logger } from '@nestjs/common';
@@ -21,9 +21,9 @@ export class GenerateAdminCommand extends CommandRunner {
 
   async run(passedParams: string[], options: Record<string, any>) {
     try {
-      const {  email, password } = options;
+      const { email, password } = options;
 
-      const user = await this.prismaService.user.findFirst({ where: { email }});
+      const user = await this.prismaService.user.findFirst({ where: { email } });
       if (user) throw new ServerException(ERROR_RESPONSE.USER_ALREADY_EXISTS);
 
       const salt = await bcrypt.genSalt();
@@ -38,15 +38,12 @@ export class GenerateAdminCommand extends CommandRunner {
       };
 
       await this.prismaService.user.create({ data: userData });
-      console.log('Created admin user successfully')
+      console.log('Created admin user successfully');
     } catch (error) {
       if (error instanceof ServerException) {
         this.logger.error(`${error.message}`);
       } else {
-        this.logger.error(
-          'An unexpected error occurred',
-          error instanceof Error ? error.stack : String(error)
-        );
+        this.logger.error('An unexpected error occurred', error instanceof Error ? error.stack : String(error));
       }
     }
   }

@@ -1,5 +1,5 @@
-import { JwtTokenType } from 'src/shared/enums';
-import { Role } from '@prisma/client';
+import type { JwtTokenType } from 'src/shared/enums';
+import type { Role } from '@prisma/client';
 
 export interface JwtPayload {
   id: number;

@@ -1,6 +1,6 @@
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { getAppConfig } from 'config';
+import { getAppConfig } from 'src/config';
 
 export const setupSwagger = (app: INestApplication) => {
   const { appName, isProductionEnv } = getAppConfig();
@@ -19,18 +19,18 @@ export const setupSwagger = (app: INestApplication) => {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth'
+      'JWT-auth',
     )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
+  SwaggerModule.setup('swagger', app, document, {
     explorer: true,
     swaggerOptions: {
       customSiteTitle: `${appName} API Documentation`,
       persistAuthorization: true,
       displayRequestDuration: true,
       docExpansion: 'list',
-    }
+    },
   });
-}
+};
