@@ -1,14 +1,14 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { ClassSerializerInterceptor } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
 import { ConfigService } from '@nestjs/config';
-import { AppModule } from './app.module';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
+import { WinstonModule } from 'nest-winston';
+import { setupSwagger } from 'src/common/docs';
 import { AllExceptionFilter } from 'src/common/exceptions';
 import { TransformInterceptor } from 'src/common/interceptors';
 import { PayloadValidationPipe } from 'src/common/pipes';
-import { setupSwagger } from 'src/common/docs';
-import { winstonConfig } from 'src/infrastructure/logger';
 import { getAppConfig } from 'src/config';
+import { winstonConfig } from 'src/infrastructure/logger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const { appName, appPort, isProductionEnv } = getAppConfig();
@@ -30,11 +30,12 @@ async function bootstrap() {
   setupSwagger(app);
   await app.listen(appPort);
 
-  !isProductionEnv &&
+  if (!isProductionEnv) {
     logger.log({
       message: `Application is ready. View Swagger at http://localhost:${appPort}/api/docs`,
       context: 'Application',
     });
+  }
 }
 
-bootstrap();
+void bootstrap();

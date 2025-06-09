@@ -1,11 +1,11 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { Role } from '@prisma/client';
 import { ACCESS_ROLES_KEY, IS_PUBLIC_KEY } from 'src/common/decorators';
 import { ServerException } from 'src/common/exceptions';
-import { ERROR_RESPONSE } from 'src/shared/constants';
-import { Role } from '@prisma/client';
 import { RequestUserPayload } from 'src/modules/auth/auth.interface';
+import { ERROR_RESPONSE } from 'src/shared/constants';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -43,7 +43,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     throw new ServerException(ERROR_RESPONSE.RESOURCE_FORBIDDEN);
   }
 
-  handleRequest(err: any, user: any, info: any) {
+  handleRequest(err: any, user: any) {
     if (err || !user) {
       throw err || new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
     }

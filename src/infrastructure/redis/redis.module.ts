@@ -32,7 +32,9 @@ import { RedisService } from './redis.service';
         try {
           await redisClient.ping();
         } catch (err) {
-          throw new Error(err.message);
+          if (err instanceof Error) {
+            throw new Error(err.message);
+          }
         }
 
         return redisClient;

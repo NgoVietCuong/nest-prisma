@@ -1,6 +1,6 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HttpAdapterHost } from '@nestjs/core';
 import { HttpExceptionResponseDto } from 'src/common/dto';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 
@@ -26,8 +26,6 @@ export class AllExceptionFilter implements ExceptionFilter {
       path: ctx.getRequest().url,
     };
 
-    console.log('error', exception);
-
     if (isHttpException) {
       const exceptionResponse = exception.getResponse() as HttpExceptionResponseDto;
       Object.assign(responseBody, exceptionResponse);
@@ -37,7 +35,9 @@ export class AllExceptionFilter implements ExceptionFilter {
 
     // Remove error details in production
     const isProductionEnv = this.configService.get<string>('app.isProductionEnv');
-    isProductionEnv && delete responseBody.details;
+    if (isProductionEnv) {
+      delete responseBody.details;
+    }
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }

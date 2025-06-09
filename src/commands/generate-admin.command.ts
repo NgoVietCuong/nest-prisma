@@ -1,11 +1,11 @@
-import { Command, CommandRunner, Option } from 'nest-commander';
-import { isEmail } from 'class-validator';
-import { PrismaService } from 'src/infrastructure/prisma';
-import { ServerException } from 'src/common/exceptions';
-import { ERROR_RESPONSE } from 'src/shared/constants';
+import * as bcrypt from 'bcrypt';
 import { Logger } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import { isEmail } from 'class-validator';
+import { Command, CommandRunner, Option } from 'nest-commander';
+import { ServerException } from 'src/common/exceptions';
+import { PrismaService } from 'src/infrastructure/prisma';
+import { ERROR_RESPONSE } from 'src/shared/constants';
 
 @Command({
   name: 'generate-admin',
@@ -19,7 +19,7 @@ export class GenerateAdminCommand extends CommandRunner {
     super();
   }
 
-  async run(passedParams: string[], options: Record<string, any>) {
+  async run(passedParams: string[], options: Record<string, string>) {
     try {
       const { email, password } = options;
 
@@ -38,7 +38,7 @@ export class GenerateAdminCommand extends CommandRunner {
       };
 
       await this.prismaService.user.create({ data: userData });
-      console.log('Created admin user successfully');
+      this.logger.log('Created admin user successfully');
     } catch (error) {
       if (error instanceof ServerException) {
         this.logger.error(`${error.message}`);

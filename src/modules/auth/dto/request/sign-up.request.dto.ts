@@ -9,7 +9,7 @@ export class SignUpBodyDto {
   @IsEmail()
   @IsString()
   @IsNotEmpty()
-  @Transform((param) => param.value.toLowerCase())
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
   email: string;
 
   @IsString()
