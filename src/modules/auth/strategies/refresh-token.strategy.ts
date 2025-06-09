@@ -24,9 +24,12 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
 
   async validate(payload: any): Promise<RequestUserPayload> {
     const { id, email, type } = payload;
-    if (type !== JwtTokenType.RefreshToken) throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
+    if (type !== JwtTokenType.RefreshToken)
+      throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
 
-    const cacheRefreshToken = await this.redisService.getValue<string>(`${JwtTokenType.RefreshToken}_${id}`);
+    const cacheRefreshToken = await this.redisService.getValue<string>(
+      `${JwtTokenType.RefreshToken}_${id}`,
+    );
     if (!cacheRefreshToken) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
 
     return { id, email };

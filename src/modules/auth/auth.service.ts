@@ -59,8 +59,16 @@ export class AuthService {
       role: user.role,
     };
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateToken(tokenPayload, JwtTokenType.AccessToken, this.jwtConfig.accessTokenExpiresIn),
-      this.generateToken(tokenPayload, JwtTokenType.RefreshToken, this.jwtConfig.refreshTokenExpiresIn),
+      this.generateToken(
+        tokenPayload,
+        JwtTokenType.AccessToken,
+        this.jwtConfig.accessTokenExpiresIn,
+      ),
+      this.generateToken(
+        tokenPayload,
+        JwtTokenType.RefreshToken,
+        this.jwtConfig.refreshTokenExpiresIn,
+      ),
     ]);
 
     await this.redisService.setValue<string>(
@@ -88,7 +96,11 @@ export class AuthService {
     return { accessToken };
   }
 
-  private generateToken(payload: Partial<JwtPayload>, type: JwtTokenType, expiresIn: number): Promise<string> {
+  private generateToken(
+    payload: Partial<JwtPayload>,
+    type: JwtTokenType,
+    expiresIn: number,
+  ): Promise<string> {
     const tokenPayload: JwtPayload = {
       id: payload.id!,
       email: payload.email!,

@@ -43,7 +43,10 @@ export class GenerateAdminCommand extends CommandRunner {
       if (error instanceof ServerException) {
         this.logger.error(`${error.message}`);
       } else {
-        this.logger.error('An unexpected error occurred', error instanceof Error ? error.stack : String(error));
+        this.logger.error(
+          'An unexpected error occurred',
+          error instanceof Error ? error.stack : String(error),
+        );
       }
     }
   }

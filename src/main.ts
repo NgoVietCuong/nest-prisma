@@ -25,7 +25,10 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new PayloadValidationPipe());
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter, configService));
-  app.useGlobalInterceptors(new TransformInterceptor(reflector), new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(
+    new TransformInterceptor(reflector),
+    new ClassSerializerInterceptor(app.get(Reflector)),
+  );
 
   setupSwagger(app);
   await app.listen(appPort);

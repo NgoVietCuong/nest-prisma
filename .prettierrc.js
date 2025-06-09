@@ -4,7 +4,7 @@ module.exports = {
   trailingComma: 'all',
   arrowParens: 'always',
   bracketSpacing: true,
-  printWidth: 120,
+  printWidth: 100,
   quoteProps: 'as-needed',
   semi: true,
   tabWidth: 2,
@@ -14,8 +14,8 @@ module.exports = {
   plugins: [require.resolve('@trivago/prettier-plugin-sort-imports')],
   importOrder: [
     '<THIRD_PARTY_MODULES>', // All external modules first
-    '^[.][.]/',              // Then relative parent imports (../)
-    '^[.]/',                 // Then relative current directory imports (./)
+    '^[.][.]/', // Then relative parent imports (../)
+    '^[.]/', // Then relative current directory imports (./)
   ],
   importOrderSortSpecifiers: true, // Sort named imports alphabetically
   importOrderGroupNamespaceSpecifiers: true, // Group `* as` imports separately

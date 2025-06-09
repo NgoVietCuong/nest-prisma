@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserService } from 'src/modules/user';
-import { jwtConfiguration } from 'src/config';
 import { ServerException } from 'src/common/exceptions';
-import { ERROR_RESPONSE } from 'src/shared/constants';
+import { jwtConfiguration } from 'src/config';
 import { RedisService } from 'src/infrastructure/redis';
-import { JwtTokenType } from 'src/shared/enums';
 import { RequestUserPayload } from 'src/modules/auth/auth.interface';
+import { UserService } from 'src/modules/user';
+import { ERROR_RESPONSE } from 'src/shared/constants';
+import { JwtTokenType } from 'src/shared/enums';
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
@@ -26,13 +26,16 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any): Promise<RequestUserPayload> {
     const { id, email, type, role } = payload;
-    if (type !== JwtTokenType.AccessToken) throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
+    if (type !== JwtTokenType.AccessToken)
+      throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
 
     const user = await this.userService.findUser({ email });
     if (!user) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
     if (!user.isActive) throw new ServerException(ERROR_RESPONSE.USER_DEACTIVATED);
 
-    const cacheRefreshToken = await this.redisService.getValue<string>(`${JwtTokenType.RefreshToken}_${user.id}`);
+    const cacheRefreshToken = await this.redisService.getValue<string>(
+      `${JwtTokenType.RefreshToken}_${user.id}`,
+    );
     if (!cacheRefreshToken) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
 
     return { id, email, role };
