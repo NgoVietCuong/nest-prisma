@@ -14,4 +14,5 @@ export const APP_DEFAULTS = {
     LENGTH: 6,
     TTL: 300000, // 5 minutes
   },
+  QUEUE_DASHBOARD_PASSWORD: 'NVC@007',
 };

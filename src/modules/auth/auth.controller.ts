@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Public, RefreshToken, ResponseMessage, User } from 'src/common/decorators';
+import { Public, ResponseMessage, User } from 'src/common/decorators';
 import { RequestUserPayload } from 'src/modules/auth/auth.interface';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { LoginBodyDto, SignUpBodyDto, SignUpResponseDto } from 'src/modules/auth/dto';
@@ -39,7 +39,6 @@ export class AuthController {
 
   @ApiOperation({ summary: 'refresh-token' })
   @ApiResponse({ status: HttpStatus.OK })
-  @RefreshToken()
   @ApiBearerAuth()
   @Post('refresh-token')
   async refreshToken(@User() userPayload: RequestUserPayload) {

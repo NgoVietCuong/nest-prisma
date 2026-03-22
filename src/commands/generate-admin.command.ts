@@ -10,7 +10,7 @@ import { ERROR_RESPONSE } from 'src/shared/constants';
 @Command({
   name: 'generate-admin',
   description: 'Generate admin user',
-  // arguments: '<email> <password>'
+  arguments: '<email> <password>',
 })
 export class GenerateAdminCommand extends CommandRunner {
   private readonly logger = new Logger(GenerateAdminCommand.name);
@@ -30,7 +30,7 @@ export class GenerateAdminCommand extends CommandRunner {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const userData = {
-        username: 'admin',
+        username: 'Admin',
         email,
         password: hashedPassword,
         emailVerified: true,

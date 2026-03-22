@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { capitalize } from 'lodash';
 
 export const ERROR_RESPONSE = {
   // General
@@ -32,10 +33,37 @@ export const ERROR_RESPONSE = {
     errorCode: 'RESOURCE_NOT_FOUND',
     message: 'Resource not found',
   },
+  UNPROCESSABLE_ENTITY: {
+    statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+    errorCode: 'unprocessable_entity',
+    message: `Unprocessable entity`,
+  },
   REQUEST_PAYLOAD_VALIDATION_ERROR: {
     statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     errorCode: 'REQUEST_PAYLOAD_VALIDATION_ERROR',
     message: 'Invalid request payload data',
+  },
+  INVALID_FILES: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    errorCode: 'invalid_files',
+    message: `Invalid files`,
+  },
+  OBJECT_NOT_FOUND: (objectName: string) => {
+    const errorCodeFormat = objectName.replace(' ', '_').toLowerCase();
+    return {
+      statusCode: HttpStatus.NOT_FOUND,
+      errorCode: `${errorCodeFormat}_not_found`,
+      message: `${objectName} not found.`,
+    };
+  },
+  DUPLICATE_RESOURCE: (objectName: string) => {
+    const errorCodeFormat = objectName.replace(' ', '_').toLowerCase();
+    const messageFormat = capitalize(objectName.replace(/_/g, ' '));
+    return {
+      statusCode: HttpStatus.CONFLICT,
+      errorCode: `${errorCodeFormat}_already_exists`,
+      message: `${messageFormat} already exists.`,
+    };
   },
   // Authentication
   USER_ALREADY_EXISTS: {

@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
 import { RedisService } from 'src/infrastructure/redis';
@@ -10,6 +10,9 @@ import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { JwtTokenType } from 'src/shared/enums';
+import { UserSessionData } from 'src/shared/interfaces';
+import { getTtlValue } from 'src/shared/utilities';
+import { v4 as uuidv4 } from 'uuid';
 import { JwtPayload, RequestUserPayload } from './auth.interface';
 
 @Injectable()
@@ -53,31 +56,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
 
-    const tokenPayload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    };
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateToken(
-        tokenPayload,
-        JwtTokenType.AccessToken,
-        this.jwtConfig.accessTokenExpiresIn,
-      ),
-      this.generateToken(
-        tokenPayload,
-        JwtTokenType.RefreshToken,
-        this.jwtConfig.refreshTokenExpiresIn,
-      ),
-    ]);
-
-    await this.redisService.setValue<string>(
-      `${JwtTokenType.RefreshToken}_${user.id}`,
-      refreshToken,
-      this.jwtConfig.refreshTokenExpiresIn * 1000,
-    );
-
-    return { accessToken, refreshToken };
+    return this.manageUserToken(user);
   }
 
   async logout(userId: number) {
@@ -96,10 +75,44 @@ export class AuthService {
     return { accessToken };
   }
 
+  private async manageUserToken(user: User) {
+    const jti = uuidv4();
+    const tokenPayload = {
+      id: user.id,
+      jti,
+      email: user.email,
+      role: user.role,
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateToken(
+        tokenPayload,
+        JwtTokenType.AccessToken,
+        this.jwtConfig.accessTokenExpiresIn,
+      ),
+      this.generateToken(
+        tokenPayload,
+        JwtTokenType.RefreshToken,
+        this.jwtConfig.refreshTokenExpiresIn,
+      ),
+    ]);
+
+    await this.redisService.setValue<UserSessionData>(
+      this.redisService.getUserTokenKey(user.id, jti),
+      {
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
+      getTtlValue(this.jwtConfig.refreshTokenExpiresIn),
+    );
+
+    return { accessToken, refreshToken };
+  }
+
   private generateToken(
     payload: Partial<JwtPayload>,
     type: JwtTokenType,
-    expiresIn: number,
+    expiresIn: number | string,
   ): Promise<string> {
     const tokenPayload: JwtPayload = {
       id: payload.id!,
