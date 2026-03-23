@@ -6,14 +6,13 @@ import { Role, User } from '@prisma/client';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
 import { RedisService } from 'src/infrastructure/redis';
-import { LoginBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
+import { LoginBodyDto, RefreshTokenBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { JwtTokenType } from 'src/shared/enums';
-import { UserSessionData } from 'src/shared/interfaces';
+import { TokenPayload, UserSessionData } from 'src/shared/interfaces';
 import { getTtlValue } from 'src/shared/utilities';
 import { v4 as uuidv4 } from 'uuid';
-import { JwtPayload, RequestUserPayload } from './auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -37,11 +36,11 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
-      role: Role.USER,
+      role: Role.User,
     };
 
-    await this.userService.createUser(userData);
-    return {};
+    const newUser = await this.userService.createUser(userData);
+    return this.manageUserToken(newUser);
   }
 
   async login(body: LoginBodyDto) {
@@ -64,11 +63,26 @@ export class AuthService {
     return {};
   }
 
-  async refreshToken(userPayload: RequestUserPayload) {
-    const accessToken = await this.generateToken(
-      userPayload,
-      JwtTokenType.AccessToken,
+  async refreshToken(body: RefreshTokenBodyDto) {
+    const { refreshToken } = body;
 
+    let payload: TokenPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
+        secret: this.jwtConfig.secret,
+      });
+    } catch {
+      throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+    }
+
+    const { id, jti } = payload;
+    const userTokenKey = this.redisService.getUserTokenKey(id, jti);
+    const isTokenValid = await this.redisService.getValue<string>(userTokenKey);
+    if (!isTokenValid) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+
+    const accessToken = await this.generateToken(
+      { ...payload, role: user.role },
+      JwtTokenType.AccessToken,
       this.jwtConfig.accessTokenExpiresIn,
     );
 
@@ -101,6 +115,7 @@ export class AuthService {
       this.redisService.getUserTokenKey(user.id, jti),
       {
         role: user.role,
+        status: user.status,
         emailVerified: user.emailVerified,
       },
       getTtlValue(this.jwtConfig.refreshTokenExpiresIn),
@@ -110,7 +125,7 @@ export class AuthService {
   }
 
   private generateToken(
-    payload: Partial<JwtPayload>,
+    payload: Partial<TokenPayload>,
     type: JwtTokenType,
     expiresIn: number | string,
   ): Promise<string> {

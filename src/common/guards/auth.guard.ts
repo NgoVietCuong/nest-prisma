@@ -4,8 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
 import { ACCESS_ROLES_KEY, IS_PUBLIC_KEY } from 'src/common/decorators';
 import { ServerException } from 'src/common/exceptions';
-import { RequestUserPayload } from 'src/modules/auth/auth.interface';
 import { ERROR_RESPONSE } from 'src/shared/constants';
+import { UserRequestPayload } from 'src/shared/interfaces';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -34,8 +34,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     ]);
 
     const request = context.switchToHttp().getRequest();
-    const user: RequestUserPayload = request.user;
-    const userRole = user.role!;
+    const user: UserRequestPayload = request.user;
+    const userRole = user.role;
     if (!allowAccessRoles?.length || allowAccessRoles.includes(userRole)) {
       return true;
     }

@@ -5,32 +5,32 @@ export const ERROR_RESPONSE = {
   // General
   INTERNAL_SERVER_ERROR: {
     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-    errorCode: 'INTERNAL_SERVER_ERROR',
+    errorCode: 'internal_server_error',
     message: `Internal Server Error`,
   },
   UNAUTHORIZED: {
     statusCode: HttpStatus.UNAUTHORIZED,
-    errorCode: 'UNAUTHORIZED',
+    errorCode: 'unauthorized',
     message: 'Authentication required',
   },
   BAD_REQUEST: {
     statusCode: HttpStatus.BAD_REQUEST,
-    errorCode: 'BAD_REQUEST',
+    errorCode: 'bad_request',
     message: `Bad Request`,
   },
   INVALID_CREDENTIALS: {
     statusCode: HttpStatus.UNAUTHORIZED,
-    errorCode: 'INVALID_CREDENTIALS',
+    errorCode: 'invalid_credentials',
     message: `Authentication failed`,
   },
   RESOURCE_FORBIDDEN: {
     statusCode: HttpStatus.FORBIDDEN,
-    errorCode: 'RESOURCE_FORBIDDEN',
+    errorCode: 'resource_forbidden',
     message: 'Access denied',
   },
   RESOURCE_NOT_FOUND: {
     statusCode: HttpStatus.NOT_FOUND,
-    errorCode: 'RESOURCE_NOT_FOUND',
+    errorCode: 'resource_not_found',
     message: 'Resource not found',
   },
   UNPROCESSABLE_ENTITY: {
@@ -40,7 +40,7 @@ export const ERROR_RESPONSE = {
   },
   REQUEST_PAYLOAD_VALIDATION_ERROR: {
     statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-    errorCode: 'REQUEST_PAYLOAD_VALIDATION_ERROR',
+    errorCode: 'request_payload_validation_error',
     message: 'Invalid request payload data',
   },
   INVALID_FILES: {
@@ -68,12 +68,12 @@ export const ERROR_RESPONSE = {
   // Authentication
   USER_ALREADY_EXISTS: {
     statusCode: HttpStatus.CONFLICT,
-    errorCode: 'USER_ALREADY_EXISTS',
+    errorCode: 'user_already_exists',
     message: 'Unable to create account with provided credentials',
   },
   EMAIL_NOT_VERIFIED: {
     statusCode: HttpStatus.UNAUTHORIZED,
-    errorCode: 'EMAIL_NOT_VERIFIED',
+    errorCode: 'email_not_verified',
     message: 'Email not verified',
   },
   USER_DEACTIVATED: {
@@ -81,9 +81,14 @@ export const ERROR_RESPONSE = {
     errorCode: 'USER_DEACTIVATED',
     message: 'Account access denied',
   },
+  USER_NOT_ACTIVE: {
+    statusCode: HttpStatus.FORBIDDEN,
+    errorCode: 'user_not_active',
+    message: 'Account access denied. Please contact support.',
+  },
   INVALID_TOKEN_USAGE: {
     statusCode: HttpStatus.FORBIDDEN,
-    errorCode: 'INVALID_TOKEN_USAGE',
+    errorCode: 'invalid_token_usage',
     message: 'Invalid token type',
   },
 };

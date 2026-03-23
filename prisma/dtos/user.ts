@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 
 export class User {
   @ApiProperty({ type: Number })
@@ -18,10 +18,10 @@ export class User {
   avatar?: string;
 
   @ApiProperty({ enum: Role, enumName: 'Role' })
-  role: Role = Role.USER;
+  role: Role = Role.User;
 
-  @ApiProperty({ type: Boolean })
-  isActive: boolean = true;
+  @ApiProperty({ enum: UserStatus, enumName: 'UserStatus' })
+  status: UserStatus = UserStatus.Active;
 
   @ApiProperty({ type: Boolean })
   emailVerified: boolean;

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
-import { JwtAuthGuard } from 'src/common/guards';
+import { JwtAuthGuard, RoleBasedAccessControlGuard } from 'src/common/guards';
 import { appConfiguration, validationSchema } from 'src/config';
 import { winstonConfig } from 'src/infrastructure/logger';
 import { PrismaModule } from 'src/infrastructure/prisma';
@@ -36,6 +36,10 @@ import { UserModule } from 'src/modules/user';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleBasedAccessControlGuard,
     },
   ],
 })

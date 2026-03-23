@@ -1,26 +1,24 @@
-import { Role } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 import { JwtTokenType } from '../enums';
 
 export interface TokenPayload {
-  id: string;
+  id: number;
   email: string;
   jti: string;
   role: Role;
   type: JwtTokenType;
-  iss: string;
-  key: string;
 }
 
 export interface UserRequestPayload {
-  id: string;
+  id: number;
   jti: string;
   email: string;
   role: Role;
   emailVerified?: boolean;
-  organizationId?: string;
 }
 
 export interface UserSessionData {
   role: Role;
+  status: UserStatus;
   emailVerified?: boolean;
 }

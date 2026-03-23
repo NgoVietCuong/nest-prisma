@@ -34,7 +34,7 @@ export class GenerateAdminCommand extends CommandRunner {
         email,
         password: hashedPassword,
         emailVerified: true,
-        role: Role.ADMIN,
+        role: Role.Admin,
       };
 
       await this.prismaService.user.create({ data: userData });
