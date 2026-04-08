@@ -6,7 +6,7 @@ Table users {
   id Int [pk, increment]
   username String [not null]
   email String [unique, not null]
-  password String [not null]
+  password String
   avatar String
   role Role [not null, default: 'User']
   status UserStatus [not null, default: 'Active']

@@ -1,11 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { Logger } from '@nestjs/common';
-import { Role } from '@prisma/client';
-import { isEmail } from 'class-validator';
 import { Command, CommandRunner, Option } from 'nest-commander';
 import { ServerException } from 'src/common/exceptions';
+import { Role } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/infrastructure/prisma';
-import { ERROR_RESPONSE } from 'src/shared/constants';
+import { z } from 'zod';
 
 @Command({
   name: 'generate-admin',
@@ -20,11 +19,14 @@ export class GenerateAdminCommand extends CommandRunner {
   }
 
   async run(passedParams: string[], options: Record<string, string>) {
-    try {
-      const { email, password } = options;
+    const { email, password } = options;
 
+    try {
       const user = await this.prismaService.user.findFirst({ where: { email } });
-      if (user) throw new ServerException(ERROR_RESPONSE.USER_ALREADY_EXISTS);
+      if (user) {
+        this.logger.warn(`User with email ${email} already exists`);
+        return;
+      }
 
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -57,8 +59,10 @@ export class GenerateAdminCommand extends CommandRunner {
     required: true,
   })
   parseEmail(val: string): string {
-    if (!isEmail(val)) {
-      throw new Error('Email is invalid');
+    const result = z.string().email('Invalid email format').safeParse(val);
+
+    if (!result.success) {
+      throw new Error(result.error.errors[0].message);
     }
     return val;
   }

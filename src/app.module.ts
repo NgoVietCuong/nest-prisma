@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { JwtAuthGuard, RoleBasedAccessControlGuard } from 'src/common/guards';
 import { appConfiguration, validationSchema } from 'src/config';
 import { winstonConfig } from 'src/infrastructure/logger';
@@ -33,6 +34,10 @@ import { UserModule } from 'src/modules/user';
     RedisModule,
   ],
   providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

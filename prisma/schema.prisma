@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma models file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
@@ -9,23 +9,18 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client"
-  previewFeatures = ["prismaSchemaFolder"]
-  binaryTargets   = ["native", "linux-arm64-openssl-3.0.x"]
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "commonjs"
 }
 
 generator dbml {
   provider = "prisma-dbml-generator"
 }
 
-generator prisma-class-generator {
-  provider                 = "prisma-class-generator"
-  dryRun                   = "false"
-  output                   = "dtos"
-  useSwagger               = "true"
-  makeIndexFile            = "true"
-  separateRelationFields   = "true"
-  clientImportPath         = "@prisma/client"
-  useNonNullableAssertions = "false"
-  preserveDefaultNullable  = "false"
+generator zod {
+  provider         = "prisma-zod-generator"
+  output           = "../src/generated/zod"
+  useMultipleFiles = true
+  createInputTypes = true
 }

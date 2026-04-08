@@ -1,8 +1,9 @@
 import { PickType } from '@nestjs/swagger';
 import { IsEmail, IsStrongPassword } from 'class-validator';
 import { PropertyDto } from 'src/common/decorators';
+import { SuccessResponseDto } from 'src/shared/dto';
 
-// ****************************** Internal Sign Up ******************************
+// ****************************** Internal Sign Up *****************************
 export class SignUpBodyDto {
   @PropertyDto({
     type: String,
@@ -73,3 +74,6 @@ export class RefreshTokenResponseDto {
   @PropertyDto()
   accessToken: string;
 }
+
+// ******************************* Logout ********************************
+export class LogoutResponseDto extends SuccessResponseDto {}

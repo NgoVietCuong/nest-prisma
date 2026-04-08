@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs', '.prettierrc.js', 'dist', 'node_modules', 'coverage', 'prisma'],
+    ignores: ['eslint.config.mjs', '.prettierrc.cjs', 'dist', 'node_modules', 'coverage', 'prisma'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -41,6 +41,8 @@ export default tseslint.config(
       ],
       'no-console': 'warn',
       'no-debugger': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'warn',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
     },
   },
 );

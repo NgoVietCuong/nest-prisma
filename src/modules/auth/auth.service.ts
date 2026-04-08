@@ -6,13 +6,13 @@ import { Role, User } from '@prisma/client';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
 import { RedisService } from 'src/infrastructure/redis';
-import { LoginBodyDto, RefreshTokenBodyDto, SignUpBodyDto } from 'src/modules/auth/dto';
 import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { JwtTokenType } from 'src/shared/enums';
 import { TokenPayload, UserSessionData } from 'src/shared/interfaces';
 import { getTtlValue } from 'src/shared/utilities';
 import { v4 as uuidv4 } from 'uuid';
+import { LoginBodyDto, RefreshTokenBodyDto, SignUpBodyDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -60,7 +60,7 @@ export class AuthService {
 
   async logout(userId: number) {
     await this.redisService.deleteKey(`${JwtTokenType.RefreshToken}_${userId}`);
-    return {};
+    return { success: true };
   }
 
   async refreshToken(body: RefreshTokenBodyDto) {
@@ -71,7 +71,7 @@ export class AuthService {
       payload = await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
         secret: this.jwtConfig.secret,
       });
-    } catch {
+    } catch (error) {
       throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
     }
 
