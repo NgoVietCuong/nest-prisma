@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@prisma/client';
 import { ACCESS_ROLES_KEY, IS_PUBLIC_KEY } from 'src/common/decorators';
 import { ServerException } from 'src/common/exceptions';
+import { Role } from 'src/generated/prisma/client';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { UserRequestPayload } from 'src/shared/interfaces';
 

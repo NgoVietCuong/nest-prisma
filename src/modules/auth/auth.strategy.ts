@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { UserStatus } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
+import { UserStatus } from 'src/generated/prisma/client';
 import { RedisService } from 'src/infrastructure/redis';
 import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';

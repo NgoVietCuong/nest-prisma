@@ -1,79 +1,28 @@
-import { PickType } from '@nestjs/swagger';
-import { IsEmail, IsStrongPassword } from 'class-validator';
-import { PropertyDto } from 'src/common/decorators';
+import { createZodDto } from 'nestjs-zod';
 import { SuccessResponseDto } from 'src/shared/dto';
+import {
+  LoginBodySchema,
+  LoginResponseSchema,
+  RefreshTokenBodySchema,
+  RefreshTokenResponseSchema,
+  SignUpBodySchema,
+  SignUpResponseSchema,
+} from '../schemas';
 
 // ****************************** Internal Sign Up *****************************
-export class SignUpBodyDto {
-  @PropertyDto({
-    type: String,
-    required: true,
-    validated: true,
-    example: 'Cuong Ngo',
-  })
-  username: string;
+export class SignUpBodyDto extends createZodDto(SignUpBodySchema) {}
 
-  @PropertyDto({
-    type: String,
-    required: true,
-    validated: true,
-    example: 'temporary001@email.com',
-  })
-  @IsEmail()
-  email: string;
-
-  @PropertyDto({
-    type: String,
-    required: true,
-    validated: true,
-    example: 'NVC@007',
-  })
-  @IsStrongPassword({
-    minLength: 8,
-    minUppercase: 1,
-    minLowercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
-  })
-  password: string;
-}
-
-export class SignUpResponseDto {
-  @PropertyDto()
-  accessToken: string;
-
-  @PropertyDto()
-  refreshToken: string;
-}
+export class SignUpResponseDto extends createZodDto(SignUpResponseSchema) {}
 
 // ****************************** Internal Login ******************************
-export class LoginBodyDto extends PickType(SignUpBodyDto, ['email'] as const) {
-  @PropertyDto({
-    type: String,
-    required: true,
-    validated: true,
-    example: 'Sota@001',
-  })
-  password: string;
-}
+export class LoginBodyDto extends createZodDto(LoginBodySchema) {}
 
-export class LoginResponseDto extends SignUpResponseDto {}
+export class LoginResponseDto extends createZodDto(LoginResponseSchema) {}
 
 // ****************************** Refresh Token ******************************
-export class RefreshTokenBodyDto {
-  @PropertyDto({
-    type: String,
-    required: true,
-    validated: true,
-    example: 'refresh.token',
-  })
-  refreshToken: string;
-}
+export class RefreshTokenBodyDto extends createZodDto(RefreshTokenBodySchema) {}
 
-export class RefreshTokenResponseDto {
-  @PropertyDto()
-  accessToken: string;
-}
+export class RefreshTokenResponseDto extends createZodDto(RefreshTokenResponseSchema) {}
 
 // ******************************* Logout ********************************
 export class LogoutResponseDto extends SuccessResponseDto {}

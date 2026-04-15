@@ -1,4 +1,4 @@
-import { Role, UserStatus } from '@prisma/client';
+import { Role, UserStatus } from 'src/generated/prisma/client';
 import { JwtTokenType } from '../enums';
 
 export interface TokenPayload {

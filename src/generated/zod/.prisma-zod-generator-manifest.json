@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "generatorVersion": "0.0.1",
-  "generatedAt": "2026-04-07T11:22:43.995Z",
-  "outputPath": "/home/sotatek/Documents/Learn_Tech/nest-prisma/src/generated/zod",
+  "generatedAt": "2026-04-11T12:04:28.855Z",
+  "outputPath": "/Users/ethanngo/Documents/Projects/nest-prisma/src/generated/zod",
   "files": [
     "schemas/enums/TransactionIsolationLevel.schema.ts",
     "schemas/enums/UserScalarFieldEnum.schema.ts",

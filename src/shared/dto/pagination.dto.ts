@@ -1,51 +1,28 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
+import { Field, z } from 'src/shared/utilities';
 
-export class PaginationQueryDto {
-  @ApiPropertyOptional({
-    type: Number,
-    example: 1,
-    description: 'This field is used for normal pagination',
-  })
-  @IsNumber()
-  @IsOptional()
-  @Min(1)
-  page?: number = 1;
+const PaginationQuerySchema = z.object({
+  page: Field.number({
+    required: false,
+    default: 1,
+    min: 1,
+  }),
 
-  @ApiProperty({
-    type: Number,
-    example: 20,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(1)
-  @Max(100)
-  pageSize?: number = 10;
-}
+  pageSize: Field.number({
+    required: true,
+    default: 20,
+    min: 1,
+    max: 100,
+  }),
+});
 
-export class PaginationMetadataResponseDto {
-  @ApiProperty()
-  page: number;
-
-  @ApiProperty()
-  pageSize: number;
-
-  @ApiProperty()
-  totalPages: number;
-
-  @ApiProperty()
-  total: number;
-}
-
-export class PaginationResponseDto<T> {
-  @ApiProperty()
-  data: T[];
-
-  @ApiProperty({
-    type: PaginationMetadataResponseDto,
-  })
-  pagination: PaginationMetadataResponseDto;
-}
+const PaginationMetadataResponseSchema = z.object({
+  page: Field.number({ required: true }),
+  pageSize: Field.number({ required: true }),
+  totalPages: Field.number({ required: true }),
+  total: Field.number({ required: true }),
+});
 
 // ---------------------- Cursor Pagination Dto -----------------------
 export class CursorPaginationQueryDto {
@@ -80,4 +57,19 @@ export class CursorPaginationResponseDto<T> {
     description: 'Indicates if there is more data to fetch.',
   })
   hasMore: boolean;
+}
+
+// ******************* DTO Classes for NestJS + Swagger *******************
+export class PaginationQueryDto extends createZodDto(PaginationQuerySchema) {}
+
+export class PaginationMetadataResponseDto extends createZodDto(PaginationMetadataResponseSchema) {}
+
+export class PaginationResponseDto<T> {
+  @ApiProperty()
+  data: T[];
+
+  @ApiProperty({
+    type: PaginationMetadataResponseDto,
+  })
+  pagination: PaginationMetadataResponseDto;
 }

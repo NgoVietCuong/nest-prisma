@@ -9,20 +9,20 @@ import { z } from 'zod';
 @Command({
   name: 'generate-admin',
   description: 'Generate admin user',
-  arguments: '<email> <password>',
 })
 export class GenerateAdminCommand extends CommandRunner {
   private readonly logger = new Logger(GenerateAdminCommand.name);
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(private readonly prisma: PrismaService) {
     super();
   }
 
   async run(passedParams: string[], options: Record<string, string>) {
     const { email, password } = options;
+    console.log('test', this.prisma);
 
     try {
-      const user = await this.prismaService.user.findFirst({ where: { email } });
+      const user = await this.prisma.user.findFirst({ where: { email } });
       if (user) {
         this.logger.warn(`User with email ${email} already exists`);
         return;
@@ -39,7 +39,7 @@ export class GenerateAdminCommand extends CommandRunner {
         role: Role.Admin,
       };
 
-      await this.prismaService.user.create({ data: userData });
+      await this.prisma.user.create({ data: userData });
       this.logger.log('Created admin user successfully');
     } catch (error) {
       if (error instanceof ServerException) {
