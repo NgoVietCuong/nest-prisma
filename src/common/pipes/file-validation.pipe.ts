@@ -1,4 +1,5 @@
 import { Injectable, PipeTransform } from '@nestjs/common';
+import 'multer';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { ServerException } from '../exceptions';
 

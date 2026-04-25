@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
-import { Role, User } from 'src/generated/prisma/client';
+import { Role, User, UserStatus } from 'src/generated/prisma/client';
 import { RedisService } from 'src/infrastructure/redis';
 import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';
@@ -50,7 +50,8 @@ export class AuthService {
     if (!user) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
     if (!user.password) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
     if (!user.emailVerified) throw new ServerException(ERROR_RESPONSE.EMAIL_NOT_VERIFIED);
-    if (!user.isActive) throw new ServerException(ERROR_RESPONSE.USER_DEACTIVATED);
+    if (user.status !== UserStatus.Active)
+      throw new ServerException(ERROR_RESPONSE.USER_DEACTIVATED);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
@@ -71,7 +72,7 @@ export class AuthService {
       payload = await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
         secret: this.jwtConfig.secret,
       });
-    } catch (error) {
+    } catch {
       throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
     }
 
@@ -79,6 +80,9 @@ export class AuthService {
     const userTokenKey = this.redisService.getUserTokenKey(id, jti);
     const isTokenValid = await this.redisService.getValue<string>(userTokenKey);
     if (!isTokenValid) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+
+    const user = await this.userService.findUser({ id });
+    if (!user) throw new ServerException(ERROR_RESPONSE.INVALID_CREDENTIALS);
 
     const accessToken = await this.generateToken(
       { ...payload, role: user.role },
@@ -129,13 +133,18 @@ export class AuthService {
     type: JwtTokenType,
     expiresIn: number | string,
   ): Promise<string> {
-    const tokenPayload: JwtPayload = {
+    const tokenPayload: TokenPayload = {
       id: payload.id!,
       email: payload.email!,
+      jti: payload.jti!,
       type,
       ...(type === JwtTokenType.AccessToken && { role: payload.role }),
     };
 
-    return this.jwtService.signAsync(tokenPayload, { expiresIn });
+    const options: Partial<JwtSignOptions> = {
+      expiresIn: expiresIn,
+    } as unknown as JwtSignOptions;
+
+    return this.jwtService.signAsync(tokenPayload, options);
   }
 }

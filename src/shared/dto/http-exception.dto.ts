@@ -1,21 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
+import { HttpErrorSchema } from 'src/shared/schemas';
 
-export class HttpErrorResponseDto {
-  @ApiProperty()
-  statusCode: number;
-
-  @ApiProperty()
-  timestamp?: string;
-
-  @ApiProperty()
-  path?: string;
-
-  @ApiProperty()
-  errorCode: string;
-
-  @ApiProperty()
-  message: string;
-
-  @ApiProperty()
-  details?: object;
-}
+export class HttpErrorResponseDto extends createZodDto(HttpErrorSchema) {}

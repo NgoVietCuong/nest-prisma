@@ -1,6 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
+import { SuccessResponseSchema } from 'src/shared/schemas';
 
-export class SuccessResponseDto {
-  @ApiProperty()
-  success: boolean;
-}
+export class SuccessResponseDto extends createZodDto(SuccessResponseSchema) {}

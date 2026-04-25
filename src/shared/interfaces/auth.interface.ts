@@ -5,7 +5,7 @@ export interface TokenPayload {
   id: number;
   email: string;
   jti: string;
-  role: Role;
+  role?: Role;
   type: JwtTokenType;
 }
 

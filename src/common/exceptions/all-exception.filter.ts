@@ -1,8 +1,8 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
-import { HttpExceptionResponseDto } from 'src/common/dto';
 import { ERROR_RESPONSE } from 'src/shared/constants';
+import { HttpErrorResponseDto } from 'src/shared/dto';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -20,14 +20,14 @@ export class AllExceptionFilter implements ExceptionFilter {
 
     const isHttpException = exception instanceof HttpException;
     const httpStatus = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const responseBody: Partial<HttpExceptionResponseDto> = {
+    const responseBody: Partial<HttpErrorResponseDto> = {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
       path: ctx.getRequest().url,
     };
 
     if (isHttpException) {
-      const exceptionResponse = exception.getResponse() as HttpExceptionResponseDto;
+      const exceptionResponse = exception.getResponse() as HttpErrorResponseDto;
       Object.assign(responseBody, exceptionResponse);
     } else {
       Object.assign(responseBody, { ...ERROR_RESPONSE.INTERNAL_SERVER_ERROR, details: exception });

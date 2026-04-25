@@ -26,7 +26,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayload): Promise<UserRequestPayload> {
-    const { id, email, type, jti, role } = payload;
+    const { id, email, type, jti } = payload;
     if (type !== JwtTokenType.AccessToken)
       throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
 
@@ -41,6 +41,6 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
       throw new ServerException(ERROR_RESPONSE.USER_NOT_ACTIVE);
     }
 
-    return { id, jti, email, role, emailVerified: userSession.emailVerified };
+    return { id, jti, email, role: userSession.role, emailVerified: userSession.emailVerified };
   }
 }

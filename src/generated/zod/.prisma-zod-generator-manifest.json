@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "generatorVersion": "0.0.1",
-  "generatedAt": "2026-04-11T12:04:28.855Z",
+  "generatedAt": "2026-04-25T15:42:26.495Z",
   "outputPath": "/Users/ethanngo/Documents/Projects/nest-prisma/src/generated/zod",
   "files": [
     "schemas/enums/TransactionIsolationLevel.schema.ts",

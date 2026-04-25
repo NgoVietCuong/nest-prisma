@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import type { WinstonModuleOptions } from 'nest-winston';
 import { getAppConfig } from 'src/config';
 import { NodeEnv } from 'src/shared/enums';
-import 'winston-daily-rotate-file';
 import type { LogInfo } from './logger.interface';
 
 export const winstonConfig = (appName: string): WinstonModuleOptions => {
@@ -12,13 +11,15 @@ export const winstonConfig = (appName: string): WinstonModuleOptions => {
   const consoleFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.colorize({ level: true, message: true }),
-    winston.format.printf((info: LogInfo) => {
+    winston.format.printf((info) => {
+      const log = info as LogInfo;
+
       const appPrefix = chalk.blue(`[${appName}]`);
-      const context = chalk.cyan(`[${info.context || 'Application'}]`);
-      if (info.message) {
-        return `${appPrefix} - ${info.timestamp}   ${context} ${info.level}: ${info.message}`;
+      const context = chalk.cyan(`[${log.context || 'Application'}]`);
+      if (log.message) {
+        return `${appPrefix} - ${log.timestamp}   ${context} ${info.level}: ${log.message}`;
       } else {
-        return `${appPrefix} - ${info.timestamp}   ${context} ${info.level}: ${JSON.stringify(info)}`;
+        return `${appPrefix} - ${log.timestamp}   ${context} ${info.level}: ${JSON.stringify(info)}`;
       }
     }),
   );

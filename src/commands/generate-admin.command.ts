@@ -19,7 +19,6 @@ export class GenerateAdminCommand extends CommandRunner {
 
   async run(passedParams: string[], options: Record<string, string>) {
     const { email, password } = options;
-    console.log('test', this.prisma);
 
     try {
       const user = await this.prisma.user.findFirst({ where: { email } });

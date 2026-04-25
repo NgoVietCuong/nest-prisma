@@ -2,10 +2,10 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { setupSwagger } from 'src/common/docs';
 import { AllExceptionFilter } from 'src/common/exceptions';
 import { TransformInterceptor } from 'src/common/interceptors';
-import { PayloadValidationPipe } from 'src/common/pipes';
 import { getAppConfig } from 'src/config';
 import { winstonConfig } from 'src/infrastructure/logger';
 import { AppModule } from './app.module';
@@ -23,7 +23,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors();
-  app.useGlobalPipes(new PayloadValidationPipe());
+  app.setGlobalPrefix('api');
+
+  app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new AllExceptionFilter(httpAdapter, configService));
   app.useGlobalInterceptors(
     new TransformInterceptor(reflector),
@@ -35,7 +37,7 @@ async function bootstrap() {
 
   if (!isProductionEnv) {
     logger.log({
-      message: `Application is ready. View Swagger at http://localhost:${appPort}/api/docs`,
+      message: `Application is ready. View Swagger at http://localhost:${appPort}/swagger`,
       context: 'Application',
     });
   }
