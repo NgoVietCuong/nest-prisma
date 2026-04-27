@@ -12,5 +12,5 @@ export function convertErrorToObject(error: any) {
     status: error.status,
   };
 
-  return _.omitBy(safeError, _.isNil);
+  return _.omitBy(safeError, (value) => _.isNil(value));
 }
