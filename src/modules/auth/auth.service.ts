@@ -12,7 +12,15 @@ import { JwtTokenType } from 'src/shared/enums';
 import { TokenPayload, UserSessionData } from 'src/shared/interfaces';
 import { getTtlValue } from 'src/shared/utilities';
 import { v4 as uuidv4 } from 'uuid';
-import { LoginBodyDto, RefreshTokenBodyDto, SignUpBodyDto } from './dto';
+import {
+  LoginBodyDto,
+  LoginResponseDto,
+  LogoutResponseDto,
+  RefreshTokenBodyDto,
+  RefreshTokenResponseDto,
+  SignUpBodyDto,
+  SignUpResponseDto,
+} from './dto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +31,7 @@ export class AuthService {
     @Inject(jwtConfiguration.KEY) private readonly jwtConfig: ConfigType<typeof jwtConfiguration>,
   ) {}
 
-  async signUp(body: SignUpBodyDto) {
+  async signUp(body: SignUpBodyDto): Promise<SignUpResponseDto> {
     const { username, email, password } = body;
     const user = await this.userService.findUser({ email });
 
@@ -43,7 +51,7 @@ export class AuthService {
     return this.manageUserToken(newUser);
   }
 
-  async login(body: LoginBodyDto) {
+  async login(body: LoginBodyDto): Promise<LoginResponseDto> {
     const { email, password } = body;
     const user = await this.userService.findUser({ email });
 
@@ -59,12 +67,12 @@ export class AuthService {
     return this.manageUserToken(user);
   }
 
-  async logout(userId: number) {
+  async logout(userId: number): Promise<LogoutResponseDto> {
     await this.redisService.deleteKey(`${JwtTokenType.RefreshToken}_${userId}`);
     return { success: true };
   }
 
-  async refreshToken(body: RefreshTokenBodyDto) {
+  async refreshToken(body: RefreshTokenBodyDto): Promise<RefreshTokenResponseDto> {
     const { refreshToken } = body;
 
     let payload: TokenPayload;

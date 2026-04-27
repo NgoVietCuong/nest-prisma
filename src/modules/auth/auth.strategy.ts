@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ServerException } from 'src/common/exceptions';
 import { jwtConfiguration } from 'src/config';
@@ -10,19 +11,24 @@ import { UserService } from 'src/modules/user';
 import { ERROR_RESPONSE } from 'src/shared/constants';
 import { JwtTokenType } from 'src/shared/enums';
 import { TokenPayload, UserRequestPayload, UserSessionData } from 'src/shared/interfaces';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private userService: UserService,
-    private redisService: RedisService,
-    @Inject(jwtConfiguration.KEY) private jwtConfig: ConfigType<typeof jwtConfiguration>,
+    private readonly userService: UserService,
+    private readonly redisService: RedisService,
+
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @Inject(jwtConfiguration.KEY) private readonly jwtConfig: ConfigType<typeof jwtConfiguration>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: jwtConfig.secret,
     });
+
+    this.logger = this.logger.child({ context: AuthStrategy.name });
   }
 
   async validate(payload: TokenPayload): Promise<UserRequestPayload> {
@@ -31,9 +37,34 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
       throw new ServerException(ERROR_RESPONSE.INVALID_TOKEN_USAGE);
 
     const userTokenKey = this.redisService.getUserTokenKey(id, jti);
-    const userSession = await this.redisService.getValue<UserSessionData>(userTokenKey);
+    let isRedisDown = false;
+    let userSession: UserSessionData | null = null;
 
-    if (!userSession) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+    try {
+      userSession = await this.redisService.getValue<UserSessionData>(userTokenKey);
+    } catch {
+      isRedisDown = true;
+    }
+
+    if (!isRedisDown && !userSession) {
+      throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+    }
+
+    // Check database when redis is down
+    if (isRedisDown) {
+      const user = await this.userService.findUser({ id });
+      if (!user) throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+
+      userSession = {
+        role: user.role,
+        status: user.status,
+        emailVerified: user.emailVerified,
+      };
+    }
+
+    if (!userSession) {
+      throw new ServerException(ERROR_RESPONSE.UNAUTHORIZED);
+    }
     if (!userSession.emailVerified) {
       throw new ServerException(ERROR_RESPONSE.EMAIL_NOT_VERIFIED);
     }

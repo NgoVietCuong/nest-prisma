@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { JwtAuthGuard, RoleBasedAccessControlGuard } from 'src/common/guards';
+import { HttpLoggerMiddleware } from 'src/common/middlewares';
 import { appConfiguration, validationSchema } from 'src/config';
 import { winstonConfig } from 'src/infrastructure/logger';
 import { PrismaModule } from 'src/infrastructure/prisma';
@@ -48,4 +49,8 @@ import { UserModule } from 'src/modules/user';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpLoggerMiddleware).forRoutes('*');
+  }
+}
